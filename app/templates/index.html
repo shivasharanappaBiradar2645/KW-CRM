@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KW-CRM Enterprise Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>KW CRM</h2>
+        <ul>
+            <li><a href="#" id="nav-dashboard" class="active" onclick="showTab('dashboard')">Dashboard</a></li>
+            <li><a href="#" id="nav-customers" onclick="showTab('customers')">Customers</a></li>
+            <li><a href="#" id="nav-contacts" onclick="showTab('contacts')">Contacts & Managers</a></li>
+            <li><a href="#" id="nav-products" onclick="showTab('products')">Products</a></li>
+            <li><a href="#" id="nav-contracts" onclick="showTab('contracts')">Contracts</a></li>
+            <li><a href="#" id="nav-orders" onclick="showTab('orders')">Orders Engine</a></li>
+            <li><a href="#" id="nav-analytics" onclick="showTab('analytics')">Pipeline & Analytics</a></li>
+            <li><a href="#" id="nav-communications" onclick="showTab('communications')">Timeline & AI Auto-Reply</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 id="page-title">Dashboard Overview</h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="openComplaintModal()">+ Simulate Customer Complaint</button>
+                <button class="btn" onclick="syncWooCommerce()">Sync WooCommerce</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Stat Cards -->
+        <div class="card-grid">
+            <div class="stat-card">
+                <h4>Pipeline Value</h4>
+                <p id="stat-pipeline" style="color: #2563eb;">$0.00</p>
+            </div>
+            <div class="stat-card">
+                <h4>Total Customers</h4>
+                <p id="stat-customers">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>People & Managers</h4>
+                <p id="stat-contacts">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>Active Contracts</h4>
+                <p id="stat-contracts">0</p>
+            </div>
+        </div>
+
+        <!-- Dynamic Content Sections -->
+
+        <!-- DASHBOARD -->
+        <div id="section-dashboard" class="content-section">
+            <div class="section-header">
+                <h3>System Overview & Automation Status</h3>
+            </div>
+            <p style="color: #64748b; line-height: 1.6;">
+                Welcome to <strong>KW CRM</strong>. Complete management & AI intelligence services active:
+            </p>
+            <ul style="margin: 15px 0 0 20px; color: #475569; line-height: 1.8;">
+                <li><strong>Dynamic Pipeline & Snoozed Lead Alerts:</strong> Automatic 4-hour scanner triggering high-priority notifications for pending orders > 48 hours without contact.</li>
+                <li><strong>Stock Depletion Analytics:</strong> Predictive sales velocity & depletion spike queries.</li>
+                <li><strong>Gemini AI Auto-Reply & Contract Renewal:</strong> Automatic complaint handling & contract renewal discount proposals.</li>
+                <li><strong>APScheduler Service:</strong> Daily automated checks for birthdays and work anniversaries.</li>
+            </ul>
+        </div>
+
+        <!-- CUSTOMERS -->
+        <div id="section-customers" class="content-section" style="display:none;">
+            <div class="section-header">
+                <h3>Customer Companies</h3>
+                <button class="btn" onclick="openCustomerModal()">+ Add New Customer</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Company Name</th>
+                        <th>Email</th>
+                        <th>Created At</th>
+                        <th>Contacts Count</th>
+                    </tr>
+                </thead>
+                <tbody id="tbl-customers"></tbody>
+            </table>
+        </div>
+
+        <!-- CONTACTS -->
+        <div id="section-contacts" class="content-section" style="display:none;">
+            <div class="section-header">
+                <h3>Contacts & People Tracking</h3>
+                <button class="btn" onclick="openContactModal()">+ Add New Contact</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Job Title</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Birthday</th>
+                        <th>Anniversary</th>
+                    </tr>
+                </thead>
+                <tbody id="tbl-contacts"></tbody>
+            </table>
+        </div>
+
+        <!-- PRODUCTS -->
+        <div id="section-products" class="content-section" style="display:none;">
+            <div class="section-header">
+                <h3>Product Catalog</h3>
+                <button class="btn" onclick="openProductModal()">+ Add New Product</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>SKU</th>
+                        <th>Price ($)</th>
+                    </tr>
+                </thead>
+                <tbody id="tbl-products"></tbody>
+            </table>
+        </div>
+
+        <!-- CONTRACTS -->
+        <div id="section-contracts" class="content-section" style="display:none;">
+            <div class="section-header">
+                <h3>Customer Contracts</h3>
+                <button class="btn" onclick="openContractModal()">+ Create New Contract</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Contract ID</th>
+                        <th>Customer</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tbl-contracts"></tbody>
+            </table>
+        </div>
+
+        <!-- ORDERS -->
+        <div id="section-orders" class="content-section" style="display:none;">
+            <div class="section-header">
+                <h3>Orders & Billing Engine</h3>
+                <div>
+                    <button class="btn btn-secondary" onclick="openOrderItemModal()">+ Add Order Line Item</button>
+                    <button class="btn" onclick="openOrderModal()">+ Create New Order</button>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer ID</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                        <th>Items Count</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody id="tbl-orders"></tbody>
+            </table>
+        </div>
+
+        <!-- ANALYTICS TAB -->
+        <div id="section-analytics" class="content-section" style="display:none;">
+            <div class="section-header">
+                <h3>Pipeline & Stock Depletion Analytics</h3>
+                <button class="btn btn-secondary" onclick="triggerSnoozedCheck()">Run Snoozed Lead Check (48h)</button>
+            </div>
+            <h4 style="margin-bottom: 12px; color: #1e293b;">Product Depletion & Velocity Spike Queries</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product SKU</th>
+                        <th>Name</th>
+                        <th>Unit Price</th>
+                        <th>Recent Sales (30d)</th>
+                        <th>Previous Sales (30d)</th>
+                        <th>Growth / Depletion Spike</th>
+                    </tr>
+                </thead>
+                <tbody id="tbl-analytics"></tbody>
+            </table>
+        </div>
+
+        <!-- COMMUNICATIONS -->
+        <div id="section-communications" class="content-section" style="display:none;">
+            <div class="section-header">
+                <h3>Engagement Timeline & AI Auto-Replies</h3>
+                <button class="btn btn-secondary" onclick="openComplaintModal()">+ Test New Complaint</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Direction</th>
+                        <th>Channel</th>
+                        <th>Subject / Type</th>
+                        <th>Message Body / AI Summary</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody id="tbl-communications"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODALS FOR ALL CREATION FORMS -->
+
+    <!-- 1. Add Customer Modal -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Customer Company</h3>
+                <span class="close" onclick="closeModal('customerModal')">&times;</span>
+            </div>
+            <form onsubmit="submitCustomerForm(event)">
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" id="custCompanyName" required>
+                </div>
+                <div class="form-group">
+                    <label>Company Email</label>
+                    <input type="email" id="custEmail" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Create Customer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. Add Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Contact / Manager</h3>
+                <span class="close" onclick="closeModal('contactModal')">&times;</span>
+            </div>
+            <form onsubmit="submitContactForm(event)">
+                <div class="form-group">
+                    <label>Select Customer Company</label>
+                    <select id="contactCustomerSelect" required></select>
+                </div>
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" id="contactFirstName" required>
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" id="contactLastName" required>
+                </div>
+                <div class="form-group">
+                    <label>Job Title</label>
+                    <input type="text" id="contactJobTitle">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="contactEmail">
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" id="contactPhone">
+                </div>
+                <div class="form-group">
+                    <label>Birthday</label>
+                    <input type="date" id="contactBirthday">
+                </div>
+                <div class="form-group">
+                    <label>Work Anniversary</label>
+                    <input type="date" id="contactAnniversary">
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Create Contact</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. Add Product Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Product</h3>
+                <span class="close" onclick="closeModal('productModal')">&times;</span>
+            </div>
+            <form onsubmit="submitProductForm(event)">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" id="prodName" required>
+                </div>
+                <div class="form-group">
+                    <label>SKU</label>
+                    <input type="text" id="prodSKU" required>
+                </div>
+                <div class="form-group">
+                    <label>Price ($)</label>
+                    <input type="number" step="0.01" id="prodPrice" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Create Product</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. Create Contract Modal -->
+    <div id="contractModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Customer Contract</h3>
+                <span class="close" onclick="closeModal('contractModal')">&times;</span>
+            </div>
+            <form onsubmit="submitContractForm(event)">
+                <div class="form-group">
+                    <label>Select Customer Company</label>
+                    <select id="contractCustomerSelect" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" id="contractStartDate" required>
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" id="contractEndDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Terms Text</label>
+                    <textarea id="contractTermsText" placeholder="Enter contract terms..."></textarea>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Create Contract</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. Create Order Modal -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Order</h3>
+                <span class="close" onclick="closeModal('orderModal')">&times;</span>
+            </div>
+            <form onsubmit="submitOrderForm(event)">
+                <div class="form-group">
+                    <label>Select Customer Company</label>
+                    <select id="orderCustomerSelect" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Order Status</label>
+                    <select id="orderStatusSelect">
+                        <option value="Pending">Pending</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Create Order</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 6. Add Order Line Item Modal -->
+    <div id="orderItemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Product Line Item to Order</h3>
+                <span class="close" onclick="closeModal('orderItemModal')">&times;</span>
+            </div>
+            <form onsubmit="submitOrderItemForm(event)">
+                <div class="form-group">
+                    <label>Select Order</label>
+                    <select id="itemOrderSelect" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Select Product</label>
+                    <select id="itemProductSelect" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" id="itemQuantity" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Unit Price ($)</label>
+                    <input type="number" step="0.01" id="itemUnitPrice" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Add Line Item & Recalculate Total</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 7. Complaint Simulation Modal -->
+    <div id="complaintModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Simulate Inbound Customer Complaint</h3>
+                <span class="close" onclick="closeModal('complaintModal')">&times;</span>
+            </div>
+            <form id="complaintForm" onsubmit="submitCustomerComplaint(event)">
+                <div class="form-group">
+                    <label>Select Customer Company</label>
+                    <select id="modalCustomerSelect" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Communication Channel</label>
+                    <select id="modalChannel" required>
+                        <option value="Email">Email</option>
+                        <option value="SMS">SMS</option>
+                        <option value="Call_Log">Call Log</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" id="modalSubject" placeholder="e.g. Shipment Delay & Billing Error" required>
+                </div>
+                <div class="form-group">
+                    <label>Complaint / Inquiry Body</label>
+                    <textarea id="modalBody" placeholder="Type complaint text here..." required></textarea>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Submit Complaint & Run Gemini AI</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
